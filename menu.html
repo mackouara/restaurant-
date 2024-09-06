@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <title>Menu du Restaurant</title>
+</head>
+<body>
+    <header></header>
+        <nav>
+            <ul>
+                <li><a href="index.html">Accueil</a></li>
+                <li><a href="menu.html">Menu</a></li>
+                <li><a href="reservation.html">Réservation</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+    <h1>Menu du Restaurant</h1>
+    <div id="menu-container"></div>
+
+    <script>
+        async function fetchMenu() {
+            const apiKey = 'AIzaSyDNIA8gFHDJRi38ZrbL_fhfrYRlHExNf_0';
+            const spreadsheetId = '1zGx537BUpVXJdZvc6PbhfSpCgElZeNb2aI0F9EGRuxw';
+            const range = 'Menu'; // Assurez-vous que votre plage de cellules correspond bien à votre Google Sheets
+
+            const url = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${range}?key=${apiKey}`;
+
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+
+                if (data.error) {
+                    console.error('Error fetching data:', data.error);
+                    return;
+                }
+
+                const rows = data.values;
+                const menuContainer = document.getElementById('menu-container');
+                menuContainer.innerHTML = ''; // Clear the menu container before populating
+
+                if (rows.length) {
+                    rows.forEach(row => {
+                        const [categorie, nom, prix, imageUrl] = row;
+
+                        const itemDiv = document.createElement('div');
+                        itemDiv.className = 'menu-item';
+
+                        const img = document.createElement('img');
+                        img.src = imageUrl;
+                        img.alt = nom;
+                        itemDiv.appendChild(img);
+
+                        const name = document.createElement('h3');
+                        name.textContent = nom;
+                        itemDiv.appendChild(name);
+
+                        const price = document.createElement('p');
+                        price.textContent = `${prix} €`;
+                        itemDiv.appendChild(price);
+
+                        const category = document.createElement('p');
+                        category.textContent = `Catégorie: ${categorie}`;
+                        itemDiv.appendChild(category);
+
+                        menuContainer.appendChild(itemDiv);
+                    });
+                } else {
+                    menuContainer.textContent = 'Aucun plat disponible.';
+                }
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        }
+
+        fetchMenu();
+    </script>
+</body>
+</html>
